@@ -20,6 +20,23 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+const passport = require("passport")
+const session = require("express-session")
+const user = require("./db/userSchema")
+
+app.use(
+  session({
+    saveUninitialized:true,
+    resave:true,
+    secret:"hd4857"
+  })
+)
+app.use(passport.initialize());
+app.use(passport.session());
+passport.serializeUser(user.serializeUser());
+passport.deserializeUser(user.deserializeUser())
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 

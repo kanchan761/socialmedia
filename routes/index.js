@@ -3,6 +3,11 @@ var router = express.Router();
 
 const user = require("../db/userSchema")
 
+const passport = require("passport")
+const LocalStrategy = require("passport-local")
+
+passport.use(new LocalStrategy(user.authenticate()))
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index');
@@ -19,12 +24,15 @@ router.get('/register', function(req, res, next) {
 
 router.post('/register-user', async function(req, res, next) {
       try{
-        const newuser = new user(req.body)
-        await newuser.save()
+        // const newuser = new user(req.body)
+        // await newuser.save()
+        // res.redirect("/login")
+        const {name,username ,email,password} = req.body
+         await user.register({name,username,email}, password)
         res.redirect("/login")
-      }
+}
       catch(error){
-          res.send(error)
+          res.send(error.message)
       }
 });
 

@@ -1,5 +1,5 @@
 const mongoose = require("mongoose")
-
+const plm = require("passport-local-mongoose")
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -24,8 +24,12 @@ const userSchema = new mongoose.Schema({
         required: [true, "Email is required"],
         match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address',],
     },
+
     password: String,
+    
 }, { timestamps: true })
 
+userSchema.plugin(plm)
 
 module.exports = mongoose.model("user", userSchema)
+
