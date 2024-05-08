@@ -17,6 +17,28 @@ router.get('/login', function(req, res, next) {
   res.render("login");
 });
 
+router.post('/login', passport.authenticate("local",{
+successRedirect :"/profile",
+failureRedirect :"/login",
+}), function(req, res, next) {
+ 
+});
+
+function isloggedIn(req,res,next){
+  if(req.isAuthenticated){
+    next()
+  }
+  else{
+    res.redirect("/login")
+  }
+}
+
+router.get("/logout",function(req,res,next){
+  req.logout(()=>{
+    res.redirect('/login')
+  })
+})
+
 router.get('/register', function(req, res, next) {
   res.render("resgister");
 });
