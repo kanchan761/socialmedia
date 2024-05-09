@@ -10,11 +10,11 @@ passport.use(new LocalStrategy(user.authenticate()))
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index');
+  res.render('index',{user : req.user});
 });
 
 router.get('/login', function(req, res, next) {
-  res.render("login");
+  res.render("login",{user : req.user});
 });
 
 router.post('/login', passport.authenticate("local",{
@@ -40,7 +40,7 @@ router.get("/logout",function(req,res,next){
 })
 
 router.get('/register', function(req, res, next) {
-  res.render("resgister");
+  res.render("resgister",{user : req.user});
 });
 
 
@@ -58,8 +58,13 @@ router.post('/register-user', async function(req, res, next) {
       }
 });
 
-router.get('/profile', function(req, res, next) {
-  res.render("profile");
+router.get('/profile', isloggedIn, function(req, res, next) {
+  res.render("profile",{user : req.user});
+});
+
+router.get('/update-user/:id', isloggedIn, function(req, res, next) {
+  res.render("update",{user : req.user});
 });
 
 module.exports = router;
+

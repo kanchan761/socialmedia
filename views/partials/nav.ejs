@@ -1,8 +1,14 @@
 
 <nav class="py-3 flex gap-36 justify-center items-center text-white font-extrabold  bg-[#000000] text-3xl">
-   <a href="/">Home</a>
-  <a href="/login">Login</a>
+
+<% if(user){ %>
+    <a href="/profile">Home</a>
+    <a href="/logout">Logout</a>
+  <%} else{ %>
+    <a href="/">Home</a>
+    <a href="/login">Login</a>
+
+ <% } %>
   <a href="/About">About</a>
-  <a href="/logout">Logout</a>
 </nav>
 
