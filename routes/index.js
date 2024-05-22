@@ -2,7 +2,9 @@ var express = require('express');
 var router = express.Router();
 
 const user = require("../db/userSchema")
-
+const upload = require("../utils/multer").single("profilepic")
+const fs = require("fs")
+const path = require("path")
 const passport = require("passport")
 const LocalStrategy = require("passport-local")
 
@@ -57,6 +59,11 @@ router.get('/update-user/:id', isLoggedIn, function(req, res, next) {
   res.render("update",{user : req.user});
 });
 
+router.post('/update-user/:id', isLoggedIn, function(req, res, next) {
+  res.render("update",{user : req.user});
+});
+
+
 router.get('/reset-password/:id', isLoggedIn, function(req, res, next) {
   res.render("reset-password",{user : req.user});
 });
@@ -65,7 +72,7 @@ router.post("/reset-password/:id", isLoggedIn, async function (req, res, next) {
   try {
     await req.user.changePassword(
       req.body.oldpassword,
-      req.body.newpassword
+      req.body.newpassword,
     );
     req.user.save();
     res.redirect(`/update-user/${req.user._id}`);
@@ -83,7 +90,67 @@ function isLoggedIn(req,res,next){
   }
 }
 
+router.get('/forget-email',  function(req, res, next) {
+  res.render("forget-email",{user : req.user});
+});
 
+router.post('/forget-email', async function(req, res, next){
+ try{
+
+  const single = await user.findOne({email : req.body.email})
+  if(single){
+    res.redirect(`/forget-password/${single._id}`)
+  
+  }else{
+    res.redirect("/forget-email")
+  }
+ }catch(error){
+  res.send(error.message)
+ }
+});
+
+router.get('/forget-password/:id',  function(req, res, next) {
+  res.render("forgetpassword", {user : req.user, id: req.params.id });
+});
+
+router.post('/forget-password/:id', async function(req, res, next) {
+  try{
+    const User = await user.findById(req.params.id);
+    await User.setPassword(req.body.password)
+    await User.save()
+    res.redirect('/login')
+  }catch(error){
+    console.log(error.message)
+  }
+});
+
+router.get('/delete-profile/:id', async function(req, res, next) {
+try{
+const id = req.params.id
+await user.findByIdAndDelete(id)
+res.redirect("/login")
+}
+catch(error){
+res.send(error.message)
+}
+
+});
+
+router.post('/image/:id', upload, isLoggedIn, async function(req, res, next) {
+
+try {
+  if(req.user.profilepic !== "default.jpeg"){
+fs.unlinkSync(path.join(__dirname,"..","public","images" , req.user.profilepic))
+}
+
+req.user.profilepic = req.file.filename;
+await req.user.save();
+res.redirect(`/update-user/${req.params.id}`)
+} catch (error) {
+    res.render(error.message)
+}
+
+});
 
 module.exports = router;
 
