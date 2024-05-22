@@ -67,7 +67,7 @@ router.post('/update-user/:id', isLoggedIn,async function(req, res, next) {
      name : req.body.name,
      email : req.body.email
     })
-    res.redirect("/login")
+    res.redirect(`/update-user/${req.params.id}`)
    } catch (error) {
     console.log(error.message)
    }
@@ -137,7 +137,11 @@ router.post('/forget-password/:id', async function(req, res, next) {
 router.get('/delete-profile/:id', async function(req, res, next) {
 try{
 const id = req.params.id
-await user.findByIdAndDelete(id)
+const deleteduser = await user.findByIdAndDelete(id)
+if(deleteduser.profilepic !== "default.jpeg"){
+  fs.unlinkSync(path.join(__dirname,"..","public","images" , deleteduser.profilepic))
+  }
+  
 res.redirect("/login")
 }
 catch(error){

@@ -5,8 +5,8 @@
 <div class="w-[100%] text-3xl font-bold text-black ml-14  text-center  ">
   <div class="absolute right-32 text-left top-20"  >
     <h4>Profile Setting</h4>
-    <a  class="text-xl" href="/reset-password/<%= user._id%>">Reset Password</a> <br>
-    <a  class="text-xl" href="/delete-profile/<%= user._id%>">Delete Profile</a><br>
+    <a  class="text-xl" href="/reset-password/<%=user._id%>">Reset Password</a> <br>
+    <a  class="text-xl" href="/delete-profile/<%=user._id%>">Delete Profile</a><br>
     <a  class="text-xl " href="/logout">Logout</a>
     
   </div>
@@ -24,6 +24,8 @@
   <img class="preview-image h-[100px] w-[100px] rounded-full object-cover" src="/images/<%= user.profilepic %>" alt="">
 
   <h1 class="text-black text-[3vw] font-bold drop-shadow-[10px 10px 10px rgba(0,0,0,0.25)]"> <%= user.name %>
+    <h1 class="text-black text-[1vw] font-bold drop-shadow-[10px 10px 10px rgba(0,0,0,0.25)]"> @<%= user.email %>
+
   </h1><br>
 </div>
 
