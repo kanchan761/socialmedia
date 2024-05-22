@@ -59,8 +59,18 @@ router.get('/update-user/:id', isLoggedIn, function(req, res, next) {
   res.render("update",{user : req.user});
 });
 
-router.post('/update-user/:id', isLoggedIn, function(req, res, next) {
-  res.render("update",{user : req.user});
+router.post('/update-user/:id', isLoggedIn,async function(req, res, next) {
+  const _id = req.params.id
+   try {
+    await user.findByIdAndUpdate({_id},{
+     username : req.body.username,
+     name : req.body.name,
+     email : req.body.email
+    })
+    res.redirect("/login")
+   } catch (error) {
+    console.log(error.message)
+   }
 });
 
 
