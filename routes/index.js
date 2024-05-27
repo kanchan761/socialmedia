@@ -8,6 +8,7 @@ const path = require("path")
 const passport = require("passport")
 const LocalStrategy = require("passport-local")
 
+const sendmail = require("../utils/mail")
 passport.use(new LocalStrategy(user.authenticate()))
 
 /* GET home page. */
@@ -83,6 +84,7 @@ router.post("/reset-password/:id", isLoggedIn, async function (req, res, next) {
     await req.user.changePassword(
       req.body.oldpassword,
       req.body.newpassword,
+
     );
     req.user.save();
     res.redirect(`/update-user/${req.user._id}`);
@@ -106,17 +108,18 @@ router.get('/forget-email',  function(req, res, next) {
 
 router.post('/forget-email', async function(req, res, next){
  try{
-
-  const single = await user.findOne({email : req.body.email})
-  if(single){
-    res.redirect(`/forget-password/${single._id}`)
-  
-  }else{
-    res.redirect("/forget-email")
+const single = await user.findOne({email : req.body.email})
+console.log(single)
+if(single){
+  sendmail(res, req.body.email, single)
+  // res.redirect(`/forget-password/${single._id}`)
+}else{
+  res.redirect("/forget-email")
   }
- }catch(error){
+}catch(error){
+  console.log(error)
   res.send(error.message)
- }
+}
 });
 
 router.get('/forget-password/:id',  function(req, res, next) {
@@ -126,10 +129,16 @@ router.get('/forget-password/:id',  function(req, res, next) {
 router.post('/forget-password/:id', async function(req, res, next) {
   try{
     const User = await user.findById(req.params.id);
+    if(User.resetPasswordToken == 1){
     await User.setPassword(req.body.password)
+  User.resetPasswordToken = 0;
     await User.save()
+  }else{
+    res.send("link Experied try Again")
+  }
     res.redirect('/login')
-  }catch(error){
+  }
+  catch(error){
     console.log(error.message)
   }
 });
