@@ -8,7 +8,7 @@ const path = require("path")
 const passport = require("passport")
 const LocalStrategy = require("passport-local")
 
-const sendmail = require("../utils/mail")
+const sendmail = require("../utils/mail") 
 passport.use(new LocalStrategy(user.authenticate()))
 
 /* GET home page. */
@@ -107,15 +107,18 @@ router.get('/forget-email',  function(req, res, next) {
 });
 
 router.post('/forget-email', async function(req, res, next){
- try{
-const single = await user.findOne({email : req.body.email})
-console.log(single)
+  try{
+    const single = await user.findOne({email : req.body.email})
+    // res.redirect(`/forget-password/${single._id}`)
 if(single){
-  sendmail(res, req.body.email, single)
-  // res.redirect(`/forget-password/${single._id}`)
-}else{
+  // sendmail(res, req.body.email, single)
+  const url = `${req.protocol}://${req.get("host")}/forget-password/${single._id}`
+    sendmail(res,user,url)
+    
+}else{  
   res.redirect("/forget-email")
-  }
+}
+
 }catch(error){
   console.log(error)
   res.send(error.message)
@@ -129,14 +132,16 @@ router.get('/forget-password/:id',  function(req, res, next) {
 router.post('/forget-password/:id', async function(req, res, next) {
   try{
     const User = await user.findById(req.params.id);
-    if(User.resetPasswordToken == 1){
+    if(User.resetPasswordToken === 1){
     await User.setPassword(req.body.password)
   User.resetPasswordToken = 0;
     await User.save()
+    res.redirect('/login')
+
   }else{
     res.send("link Experied try Again")
   }
-    res.redirect('/login')
+    // res.redirect('/login')
   }
   catch(error){
     console.log(error.message)
