@@ -2,7 +2,10 @@ var express = require('express');
 var router = express.Router();
 
 const user = require("../db/userSchema")
-const upload = require("../utils/multer").single("profilepic")
+const post = require("../db/postschema")
+
+// const upload = require("../utils/multer").single("profilepic")
+const upload = require("../utils/multer")
 const fs = require("fs")
 const path = require("path")
 const passport = require("passport")
@@ -23,7 +26,9 @@ router.get('/login', function(req, res, next) {
 router.post('/login', passport.authenticate("local",{
 successRedirect :"/profile",
 failureRedirect :"/login",
-}), function(req, res, next) {
+}), function(req, res, next) {  
+
+
  
 });
 
@@ -48,12 +53,20 @@ router.post('/register-user', async function(req, res, next) {
         res.redirect("/login")
       }
       catch(error){
+
         res.send(error.message)
       }
 }); 
 
-router.get('/profile', isLoggedIn, function(req, res, next) {
-  res.render("profile",{user : req.user});
+router.get('/profile', isLoggedIn,async function(req, res, next) {
+  try {
+    const posts = await post.find().populate("user")
+    console.log(req.user);
+    res.render("profile",{user : req.user, posts});
+  } catch (error) {
+    console.log(error)
+    res.send(error)
+  }
 });
 
 router.get('/update-user/:id', isLoggedIn, function(req, res, next) {
@@ -164,7 +177,7 @@ res.send(error.message)
 
 });
 
-router.post('/image/:id', upload, isLoggedIn, async function(req, res, next) {
+router.post('/image/:id', upload.single("profilepic"), isLoggedIn, async function(req, res, next) {
 
 try {
   if(req.user.profilepic !== "default.jpeg"){
@@ -179,6 +192,31 @@ res.redirect(`/update-user/${req.params.id}`)
 }
 
 });
+
+
+router.get('/post-create/', function(req, res, next) {
+  res.render("postcreate", {user: req.user})
+});
+
+
+router.post('/post-create/',isLoggedIn,upload.single("media"), async function(req, res, next) {
+  try {
+  const newpost = new post({
+    title : req.body.title,
+    media : req.file.filename,
+    user : req.user._id
+})
+    req.user.posts.push(newpost._id)
+    await newpost.save()
+    await req.user.save()
+
+    res.redirect(`/profile`)
+  } catch (error) {
+      res.render(error.message)
+  }
+  
+});
+
 
 module.exports = router;
 

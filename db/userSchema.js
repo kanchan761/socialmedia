@@ -31,7 +31,9 @@ const userSchema = new mongoose.Schema({
     },
 
     password: String,
+
     posts : [ {type : mongoose.Schema.Types.ObjectId, ref:"post"}],
+
     resetPasswordToken: {
         type: Number,
         default: 0,
@@ -43,4 +45,15 @@ const userSchema = new mongoose.Schema({
 userSchema.plugin(plm)
 
 module.exports = mongoose.model("user", userSchema)
+
+
+
+
+
+
+
+
+
+
+
 
