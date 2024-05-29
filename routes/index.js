@@ -217,6 +217,21 @@ router.post('/post-create/',isLoggedIn,upload.single("media"), async function(re
   
 });
 
+router.get('/like/:postid', isLoggedIn,async function(req, res, next) {
+  try {
+    const Post =await post.findById(req.params.postid)
+    if(Post.likes.includes(req.user._id)){
+      Post.likes = Post.likes.filter((uid) => uid != req.user.id);
+    }else{
+      Post.likes.push(req.user._id)
+    }
+    await Post.save()
+    res.redirect('/profile')
+  } catch (error) {
+    console.log(error)
+  }
+});
+
 
 module.exports = router;
 
