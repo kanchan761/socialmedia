@@ -28,8 +28,6 @@ successRedirect :"/profile",
 failureRedirect :"/login",
 }), function(req, res, next) {  
 
-
- 
 });
 
 
@@ -229,6 +227,29 @@ router.get('/like/:postid', isLoggedIn,async function(req, res, next) {
     res.redirect('/profile')
   } catch (error) {
     console.log(error)
+  }
+});
+
+
+router.get('/timeline', isLoggedIn,async function(req, res, next) {
+  try {
+   res.render("timeline",{user : await req.user.populate("posts")});
+  } catch (error) {
+    // console.log(error)  
+    res.send(error)
+  }
+});
+
+router.get("/delete-post/:id", isLoggedIn, async function (req, res, next) {
+  try {
+      const deletepost = await post.findByIdAndDelete(req.params.id);
+
+      fs.unlinkSync(
+          path.join(__dirname, "..", "public", "images", deletepost.media)
+      );
+      res.redirect("/timeline");
+  } catch (error) {
+      res.send(error);
   }
 });
 
