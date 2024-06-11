@@ -60,6 +60,7 @@ router.get('/profile', isLoggedIn,async function(req, res, next) {
   try {
     const posts = await post.find().populate("user")
     console.log(req.user);
+    console.log(posts);
     res.render("profile",{user : req.user, posts});
   } catch (error) {
     console.log(error)
